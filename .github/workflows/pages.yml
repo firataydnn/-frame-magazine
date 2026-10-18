@@ -46,7 +46,7 @@ jobs:
         run: |
           set -euo pipefail
           BASE="https://firataydnn.github.io/-frame-magazine"
-          for endpoint in "/" "/tr/" "/tr/gazete/" "/tr/gundem/" "/assets/edition02.css"; do
+          for endpoint in "/" "/tr/" "/tr/gazete/" "/tr/mansetler/" "/tr/gundem/" "/assets/edition02.css"; do
             STATUS="000"
             for try in 1 2 3 4 5 6; do
               STATUS=$(curl --location --silent --show-error --output /tmp/frame-response --write-out '%{http_code}' --max-time 15 "$BASE$endpoint" || true)
@@ -58,8 +58,9 @@ jobs:
               head -c 200 /tmp/frame-response || true
               exit 1
             fi
-            if [ "$endpoint" = "/tr/gazete/" ]; then
-              grep -q "572 İÇERİĞİN TAMAMI" /tmp/frame-response
-              echo "PASS: all-572 newspaper marker appears on deployed URL"
+            if [ "$endpoint" = "/tr/mansetler/" ] || [ "$endpoint" = "/tr/gazete/" ]; then
+              grep -q 'issue-news-grid' /tmp/frame-response
+              grep -q 'Sinema dünyasından' /tmp/frame-response
+              echo "PASS: compact 30-headline first-screen newsboard appears on deployed URL"
             fi
           done
