@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 const root='_site', dirs=path.join(root,'tr','articles');
 const articleDirs=fs.readdirSync(dirs,{withFileTypes:true}).filter(d=>d.isDirectory() && /-\d+$/.test(d.name));
-if(articleDirs.length!==556)throw new Error('Expected 556 generated article dirs; got '+articleDirs.length);
+if(articleDirs.length!==572)throw new Error('Expected 572 generated article dirs; got '+articleDirs.length);
 let images=0,errors=[];
 for(const dir of articleDirs){
   const file=path.join(dirs,dir.name,'index.html');
@@ -23,5 +23,19 @@ if(!newspaperCss.includes('.np-lead')||!newspaperCss.includes('.np-newsgrid'))er
 if(!css.includes('.frame-cover img'))errors.push('photo CSS missing');
 if(!fs.existsSync(path.join(root,'en','index.html')))errors.push('English edition missing');
 if(!fs.existsSync(path.join(root,'ar','index.html')))errors.push('Arabic edition missing');
+
+const issuePath=path.join(root,'tr','gundem','index.html');
+if(!fs.existsSync(issuePath))errors.push('dated October news edition missing');
+else{
+ const issue=fs.readFileSync(issuePath,'utf8');
+ const issueLinks=new Set([...issue.matchAll(/href="\/-frame-magazine\/tr\/articles\/([^"?#]+)\/"/g)].map(m=>m[1]));
+ if(issueLinks.size!==30)errors.push('expected 30 linked October 2026 news items, got '+issueLinks.size);
+ if(!issue.includes('30</strong>'))errors.push('missing news count in issue');
+}
+const homepageLinks=new Set([...home.matchAll(/href="\/-frame-magazine\/tr\/articles\/([^"?#]+)\/"/g)].map(m=>m[1]));
+if(homepageLinks.size<80)errors.push('expected 80+ distinct news and feature links on homepage, got '+homepageLinks.size);
+const base=JSON.parse(fs.readFileSync('data/frame_archive_556.json','utf8'));
+const added=JSON.parse(fs.readFileSync('data/frame_verified_october_2026.json','utf8'));
+if(base.length!==556||added.length!==16)errors.push('source article count drift');
 if(errors.length)throw new Error(errors.slice(0,20).join('\n'));
-console.log('FRAME QA passed: 556 archive article pages plus '+(articleDirs.length-556)+' existing pilot pages; '+images+' article visuals, newspaper homepage and responsive CSS.');
+console.log('FRAME QA passed: 572 article pages, 30 dated news stories, '+homepageLinks.size+' distinct homepage stories, '+images+' article visuals and responsive newspaper CSS.');
