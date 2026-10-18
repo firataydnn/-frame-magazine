@@ -14,16 +14,17 @@ for(const dir of articleDirs){
   else images++;
 }
 const home=fs.readFileSync(path.join(root,'tr','index.html'),'utf8');
-if(!home.includes('top-grid'))errors.push('compact newspaper four-column front page missing');
-if(!home.includes('FRAME / SAYI 02'))errors.push('new newspaper issue marker missing');
-if(!home.includes('30</b>'))errors.push('30 news count missing from masthead');
-if((home.match(/<img /g)||[]).length<1)errors.push('newspaper lead photo missing');
+if(!home.includes('issue-news-grid'))errors.push('30-headline newsboard at top of newspaper missing');
+if(!home.includes('Sinema dünyasından'))errors.push('all-news heading missing');
+if((home.match(/class="issue-news-headline/g)||[]).length!==30)errors.push('expected 30 visible news headlines in first section');
+if(!home.includes('global-search'))errors.push('full archive search missing');
 const css=fs.readFileSync(path.join(root,'assets','archive.css'),'utf8');
 const newspaperCss=fs.readFileSync(path.join(root,'assets','newspaper.css'),'utf8');
 if(!newspaperCss.includes('.np-lead')||!newspaperCss.includes('.np-newsgrid'))errors.push('legacy newspaper responsive CSS missing');
 const issueCSS=fs.readFileSync(path.join(root,'assets','edition02.css'),'utf8');
 if(!issueCSS.includes('.top-grid')||!issueCSS.includes('@media(max-width:460px)'))errors.push('new issue responsive CSS missing');
 if(!fs.existsSync(path.join(root,'tr','gazete','index.html')))errors.push('new dedicated newspaper URL missing');
+if(!fs.existsSync(path.join(root,'tr','mansetler','index.html')))errors.push('uncached full-headlines route missing');
 const coveragePath=path.join(root,'tr','gazete','coverage.json');
 if(!fs.existsSync(coveragePath))errors.push('newspaper coverage manifest missing');
 else{const coverage=JSON.parse(fs.readFileSync(coveragePath,'utf8'));if(coverage.homepageArticleLinks!==572||coverage.archive!==542||coverage.news!==30||coverage.sections!==18)errors.push('incomplete 572-article issue coverage: '+JSON.stringify(coverage));}
@@ -46,4 +47,4 @@ const base=JSON.parse(fs.readFileSync('data/frame_archive_556.json','utf8'));
 const added=JSON.parse(fs.readFileSync('data/frame_verified_october_2026.json','utf8'));
 if(base.length!==556||added.length!==16)errors.push('source article count drift');
 if(errors.length)throw new Error(errors.slice(0,20).join('\n'));
-console.log('FRAME ISSUE 02 QA passed: 572 HTML stories; 572/572 distinct links on the front page; 30 news + 542 archive records; 18 complete categories.');
+console.log('FRAME ISSUE 03 QA passed: 572 stories; 30 compact headlines displayed first; 572/572 links; 542 archive records; 18 categories.');
