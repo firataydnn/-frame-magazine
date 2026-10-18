@@ -1,8 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 const BASE='/-frame-magazine', ORIGIN='https://firataydnn.github.io'+BASE;
-const records=JSON.parse(fs.readFileSync('data/frame_archive_556.json','utf8'));
-if(records.length!==556||new Set(records.map(x=>x.id)).size!==556)throw Error('Expected 556 unique articles');
+const archiveRecords=JSON.parse(fs.readFileSync('data/frame_archive_556.json','utf8'));
+const freshReports=JSON.parse(fs.readFileSync('data/frame_verified_october_2026.json','utf8'));
+const records=[...archiveRecords,...freshReports];
+if(archiveRecords.length!==556||freshReports.length!==16||records.length!==572||new Set(records.map(x=>x.id)).size!==572)throw Error('Expected 556 archive records + 16 new reports = 572 unique articles');
 const OUT='_site';fs.rmSync(OUT,{recursive:true,force:true});fs.mkdirSync(OUT,{recursive:true});
 for(const f of ['index.html','assets','tr','en','fr','de','es','it','pt','ar','ja','ko','zh-hans','hi','ru','nl','pl'])if(fs.existsSync(f))fs.cpSync(f,path.join(OUT,f),{recursive:true});
 const e=s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
@@ -11,7 +13,7 @@ const dt=x=>x.date||x.published_at||x.source_date||'';
 const sorted=[...records].sort((a,b)=>dt(b).localeCompare(dt(a))||b.id-a.id);
 const art=x=>`${slug(x.title)}-${x.id}`;const href=x=>`${BASE}/tr/articles/${art(x)}/`;
 const shade=x=>['#202b37','#242f29','#32282e','#22283c','#38251f'][String(x.cat??'').length%5];
-const photoIds=["photo-1489599849927-2ee91cede3ba","photo-1478720568477-152d9b164e26","photo-1485846234645-a62644f84728","photo-1517604931442-7e0c8ed2963c","photo-1516035069371-29a1b244cc32","photo-1579783902614-a3fb3927b6a5","photo-1547891654-e66ed7ebb968","photo-1577083552431-6e5fd01aa342","photo-1500534623283-312aade485b7","photo-1518709268805-4e9042af9f23","photo-1492684223066-81342ee5ff30","photo-1503095396549-807759245b35","photo-1534447677768-be436bb09401","photo-1524985069026-dd778a71c7b4","photo-1533929736458-ca588d08c8be","photo-1500534314209-a25ddb2bd429","photo-1507003211169-0a1dd7228f2d","photo-1497366754035-f200968a6e72","photo-1482160549825-59d1b23cb208","photo-1531058020387-3be344556be6","photo-1515378791036-0648a3ef77b2","photo-1531058020387-3be344556be6","photo-1481627834876-b7833e8f5570","photo-1561214115-f2f134cc4912"];
+const photoIds=["photo-1489599849927-2ee91cede3ba","photo-1478720568477-152d9b164e26","photo-1485846234645-a62644f84728","photo-1517604931442-7e0c8ed2963c","photo-1516035069371-29a1b244cc32","photo-1579783902614-a3fb3927b6a5","photo-1547891654-e66ed7ebb968","photo-1577083552431-6e5fd01aa342","photo-1500534623283-312aade485b7","photo-1518709268805-4e9042af9f23","photo-1492684223066-81342ee5ff30","photo-1503095396549-807759245b35","photo-1534447677768-be436bb09401","photo-1524985069026-dd778a71c7b4","photo-1533929736458-ca588d08c8be","photo-1500534314209-a25ddb2bd429","photo-1507003211169-0a1dd7228f2d","photo-1497366754035-f200968a6e72","photo-1482160549825-59d1b23cb208","photo-1531058020387-3be344572be6","photo-1515378791036-0648a3ef77b2","photo-1531058020387-3be344572be6","photo-1481627834876-b7833e8f5570","photo-1561214115-f2f134cc4912"];
 const specialImageIds={20002:1,20003:4,20004:3,20006:0,20008:9,20009:10,20010:8,20011:2,20012:2,20013:13,20014:17,30030:4,30042:7,30026:3,30043:6,30045:7,30005:18,30047:5,30033:1};
 const photohash=x=>{const n=String(x.title||'')+' '+String(x.cat||'');let h=0;for(const ch of n)h=(h*31+ch.charCodeAt(0))>>>0;return h};
 function photourl(x,w=960){const c=String(x.cat||'').toLocaleLowerCase('tr'),t=String(x.title||'').toLocaleLowerCase('tr');
@@ -56,32 +58,52 @@ function cards(rows){return '<div class="frame-grid">'+rows.map(x=>'<a class="fr
 const cats=[...new Set(records.map(x=>x.cat||'Sinema'))].sort((a,b)=>a.localeCompare(b,'tr'));
 const caturl=c=>`${BASE}/tr/konular/${slug(c)||'sinema'}/`;
 const catbar=`<div id="categories" class="frame-cats">${cats.map(c=>`<a href="${caturl(c)}">${e(c)} (${records.filter(x=>(x.cat||'Sinema')===c).length})</a>`).join('')}</div>`;
-for(const x of records){const paras=Array.isArray(x.body)?x.body:typeof x.body==='string'?[x.body]:[];const source=String(x.source||x.source_url||'');const link=/^https:\/\/[^\s"'<>]+$/.test(source)?`<a href="${e(source)}" target="_blank" rel="noopener noreferrer">${e(source)}</a>`:'Bu kayıtta kaynak bağlantısı yok.';let content=`<article class="frame-article"><div class="frame-meta">${e(x.cat||'Sinema')} · ${e(dt(x))}</div><h1 class="frame-title">${e(x.title)}</h1><p class="frame-dek">${e(x.desc||'')}</p><div class="frame-cover frame-feature-photo" style="--shade:${shade(x)}">${photoMarkup(x,false)}<span>FRAME / ${e(x.cat||'CINEMA')}</span></div>${note}<div class="frame-body">${paras.map(p=>`<p>${e(p)}</p>`).join('')||'<p>Uzun metin hazırlık aşamasında.</p>'}<div class="frame-source"><b>KAYNAK</b><p>${link}</p><p>Editoryal durum: Kontrol bekliyor.</p><a href="${BASE}/tr/archive/">← 556 yazılık arşive dön</a></div></div></article>`;write(`tr/articles/${art(x)}/index.html`,page(x.title,content))}
-const pages=Math.ceil(sorted.length/36);for(let i=0;i<pages;i++){let cardsOnPage=cards(sorted.slice(i*36,(i+1)*36));let pager=`<div class="frame-pages">${Array.from({length:pages},(_,j)=>j===i?`<strong>${j+1}</strong>`:`<a href="${BASE}/tr/archive/${j===0?'':`page/${j+1}/`}">${j+1}</a>`).join('')}</div>`;let main=`<div class="frame-head"><h1>FRAME Arşivi</h1><span>556 kayıt · Sayfa ${i+1}/${pages}</span></div>${note}${i===0?catbar:''}${cardsOnPage}${pager}`;write(i===0?'tr/archive/index.html':`tr/archive/page/${i+1}/index.html`,page('556 Makale — FRAME Arşivi',main))}
+for(const x of records){const paras=Array.isArray(x.body)?x.body:typeof x.body==='string'?[x.body]:[];const source=String(x.source||x.source_url||'');const link=/^https:\/\/[^\s"'<>]+$/.test(source)?`<a href="${e(source)}" target="_blank" rel="noopener noreferrer">${e(source)}</a>`:'Bu kayıtta kaynak bağlantısı yok.';let content=`<article class="frame-article"><div class="frame-meta">${e(x.cat||'Sinema')} · ${e(dt(x))}</div><h1 class="frame-title">${e(x.title)}</h1><p class="frame-dek">${e(x.desc||'')}</p><div class="frame-cover frame-feature-photo" style="--shade:${shade(x)}">${photoMarkup(x,false)}<span>FRAME / ${e(x.cat||'CINEMA')}</span></div>${note}<div class="frame-body">${paras.map(p=>`<p>${e(p)}</p>`).join('')||'<p>Uzun metin hazırlık aşamasında.</p>'}<div class="frame-source"><b>KAYNAK</b><p>${link}</p><p>Editoryal durum: Kontrol bekliyor.</p><a href="${BASE}/tr/archive/">← 572 yazılık arşive dön</a></div></div></article>`;write(`tr/articles/${art(x)}/index.html`,page(x.title,content))}
+const pages=Math.ceil(sorted.length/36);for(let i=0;i<pages;i++){let cardsOnPage=cards(sorted.slice(i*36,(i+1)*36));let pager=`<div class="frame-pages">${Array.from({length:pages},(_,j)=>j===i?`<strong>${j+1}</strong>`:`<a href="${BASE}/tr/archive/${j===0?'':`page/${j+1}/`}">${j+1}</a>`).join('')}</div>`;let main=`<div class="frame-head"><h1>FRAME Arşivi</h1><span>572 kayıt · Sayfa ${i+1}/${pages}</span></div>${note}${i===0?catbar:''}${cardsOnPage}${pager}`;write(i===0?'tr/archive/index.html':`tr/archive/page/${i+1}/index.html`,page('572 Makale — FRAME Arşivi',main))}
 for(const cat of cats){let filtered=sorted.filter(x=>(x.cat||'Sinema')===cat);write(`tr/konular/${slug(cat)||'sinema'}/index.html`,page(cat,`<div class="frame-head"><h1>${e(cat)}</h1><a href="${BASE}/tr/archive/">Tüm arşiv →</a></div>${note}${cards(filtered)}`))}
 
 
+
 const pick=id=>records.find(x=>x.id===id)||sorted[0];
-const lead=pick(20002);
 const npDate=x=>dt(x)?dt(x).split('-').reverse().join('.'):'';
-const newsline=x=>'<a class="np-side-story" href="'+href(x)+'"><span class="np-meta">'+e(x.cat||'Sinema')+' / '+e(npDate(x))+'</span><h3>'+e(x.title)+'</h3><p>'+e(x.desc||'')+'</p></a>';
-const regular=(x,featured=false,image=false)=>'<a href="'+href(x)+'" class="np-newsitem'+(featured?' is-feature':'')+'">'+(image?'<img class="np-small-img" loading="lazy" src="'+photourl(x,820)+'" alt="Temsili sinema görseli">':'')+'<span class="np-meta">'+e(x.cat||'Sinema')+' / '+e(npDate(x))+'</span><h3>'+e(x.title)+'</h3><p>'+e(x.desc||'')+'</p></a>';
-const briefs=ids=>ids.map(id=>{const x=pick(id);return '<a class="np-brief np-textlink" href="'+href(x)+'"><span class="np-meta">'+e(x.cat||'Kültür')+'</span><h3>'+e(x.title)+'</h3><time>'+e(npDate(x))+'</time></a>'}).join('');
-const features=ids=>ids.map(id=>{const x=pick(id);return '<a class="np-feature-card np-textlink" href="'+href(x)+'"><img src="'+photourl(x,1100)+'" alt="Temsili editoryal görsel" loading="lazy"><span class="np-meta">'+e(x.cat||'DOSYA')+' / ARŞİV</span><h3>'+e(x.title)+'</h3><p>'+e(x.desc||'')+'</p></a>'}).join('');
-const reports=ids=>ids.map(id=>{const x=pick(id);return '<a class="np-small-report np-textlink" href="'+href(x)+'"><img src="'+photourl(x,350)+'" alt="Temsili editoryal görsel" loading="lazy"><div><span class="np-meta">'+e(x.cat||'DOSYA')+'</span><h3>'+e(x.title)+'</h3><p>'+e(x.desc||'')+'</p></div></a>'}).join('');
-const sec=(name,id,linkText,link)=>'<div class="np-heading" id="'+id+'"><h2>'+name+'</h2><a href="'+(link||BASE+'/tr/archive/')+'">'+(linkText||'BÜTÜN HABERLER')+' →</a></div>';
-const ticker=[20004,20001,20003].map(id=>pick(id)).map(x=>'<a href="'+href(x)+'">'+e(x.title)+'</a>').join('');
-const frontMain=
- '<div class="np-breaking"><b>SON HABERLER</b>'+ticker+'</div>'
- +'<section class="np-lead"><div class="np-lead-text"><div class="np-eyebrow">GÜNDEM / SİNEMA</div><a class="np-textlink" href="'+href(lead)+'"><h1>'+e(lead.title)+'</h1></a><p>'+e(lead.desc||'')+'</p><div class="np-author">FRAME HABER MASASI · '+e(npDate(lead))+'</div></div><figure class="np-lead-visual"><a href="'+href(lead)+'"><img src="'+photourl(lead,1200)+'" alt="Sinema gündemi için temsili editoryal fotoğraf" fetchpriority="high" loading="eager"></a><figcaption>Temsili editoryal fotoğraf · Resmî film karesi değildir</figcaption></figure><aside class="np-lead-side"><div class="np-sidecap">DİĞER ÖNEMLİ HABERLER</div>'+[20004,20001,20003].map(id=>newsline(pick(id))).join('')+'</aside></section>'
- +'<section class="np-section">'+sec('Sinema Gündemi','gundem','TÜM GÜNDEM',BASE+'/tr/archive/')
- +'<div class="np-newsgrid"><div class="np-newscol">'+regular(pick(20010),true,true)+regular(pick(20007))+regular(pick(20008))+'</div><div class="np-newscol">'+regular(pick(20005),true,true)+regular(pick(20009))+regular(pick(20014))+'</div><div class="np-newscol">'+briefs([20011,20012,20013,20006])+'</div></div></section>'
- +'<section class="np-section">'+sec('Kamera Arkası & Büyük Hikâyeler','ozel-dosyalar','BÜTÜN DOSYALAR',BASE+'/tr/archive/')
- +'<div class="np-feature-grid">'+features([30030,30042,30043])+'</div></section>'
- +'<section class="np-section"><div class="np-split"><div>'+sec('Sanat & Kültür','sanat','SANAT ARŞİVİ',BASE+'/tr/konular/sanat-tarihi/')+reports([30041,30045,30047,30053])+'</div><div>'+sec('Yapay Zekâ & Filmcilik','teknoloji','TEKNOLOJİ ARŞİVİ',BASE+'/tr/konular/yapay-zeka/')+reports([30006,30008,30039,30031])+'</div></div></section>'
- +'<section class="np-picks"><strong>ARŞİVİ KEŞFET</strong>'+cats.map(c=>'<a href="'+caturl(c)+'">'+e(c)+'</a>').join('')+'</section>'
- +'<p class="np-disclaimer">FRAME editoryal arşivi 556 ayrı içerik sayfası içeriyor. Kısa taslaklar ve eski haberler yayın tarihleriyle gösterilir. Bazı görseller temsili fotoğraflardır; asıl film veya sanat eseri fotoğrafları olarak sunulmaz. Tüm yazıların yayın öncesi editoryal kontrolü sürmektedir.</p>';
-write('tr/index.html',page('FRAME — Küresel Sinema ve Sanat Gazetesi',frontMain));
+const news=records.filter(x=>(x.id>=20001&&x.id<=20014)||(x.id>=40001&&x.id<=40016)).sort((a,b)=>dt(b).localeCompare(dt(a))||b.id-a.id);
+if(news.length!==30)throw Error('Expected 30 news items, got '+news.length);
+const section=(title,id,route,label='BÜTÜN DOSYALAR')=>'<div class="np-heading" id="'+id+'"><h2>'+title+'</h2><a href="'+route+'">'+label+' →</a></div>';
+const feed=(list,{dense=false,images=0}={})=>'<div class="np-feed-grid'+(dense?' dense':'')+'">'+list.map((x,i)=>'<a class="np-feed-item'+(i<images?' has-thumb':'')+'" href="'+href(x)+'">'+(i<images?'<img src="'+photourl(x,750)+'" loading="lazy" alt="Konuyla ilişkili temsili sinema görseli">':'')+'<span class="np-feed-meta">'+e(x.cat||'SİNEMA')+' · '+e(npDate(x))+'</span><h3>'+e(x.title)+'</h3><p>'+e(x.desc||'')+'</p></a>').join('')+'</div>';
+const pickSection=(category,count=10)=>sorted.filter(x=>x.cat===category&&x.id<40000&&x.id!==20001).slice(0,count);
+const artRail=(title,id,category,count=10)=>{
+ const items=pickSection(category,count);
+ return '<section class="np-section">'+section(title,id,caturl(category),category.toUpperCase()+' ARŞİVİ')+feed(items,{dense:true,images:2})+'</section>';
+};
+const lead=pick(40001);
+const sideNews=[40003,40002,40004,40005].map(pick);
+const displayed=new Set([lead.id,...sideNews.map(x=>x.id)]);
+const others=news.filter(x=>!displayed.has(x.id));
+const ticker=news.slice(0,5).map(x=>'<a href="'+href(x)+'">'+e(x.title)+'</a>').join('');
+const gundemPage='<div class="np-counts"><span><strong>'+news.length+'</strong> Ekim 2026 haberi</span><span><strong>'+records.length+'</strong> toplam içerik</span><span><strong>'+cats.length+'</strong> kategori</span></div>'
+ +'<h1 class="np-feed-title">Sinema gündemi — Ekim 2026</h1><p class="np-feed-note">Bu sayfada 12–17 Ekim tarihli haberlerle Ekim başından seçilmiş gelişmeler bulunuyor. Haberleri yayın tarihleriyle sunuyoruz; otomatik canlı akış değildir.</p>'
+ +feed(news,{images:3})
+ +'<div class="np-show-all"><a href="'+BASE+'/tr/archive/">572 KAYITLIK ARŞİVE GİT →</a></div>';
+write('tr/gundem/index.html',page('Ekim 2026 Sinema Gündemi — 30 Haber',gundemPage));
+const sideNewsHtml=sideNews.slice(0,3).map(x=>'<a class="np-side-story" href="'+href(x)+'"><span class="np-meta">'+e(x.cat)+' / '+e(npDate(x))+'</span><h3>'+e(x.title)+'</h3><p>'+e(x.desc||'')+'</p></a>').join('');
+const first12=others.slice(0,12);
+const rest=others.slice(12);
+const main='<div class="np-breaking"><b>EKİM 2026</b>'+ticker+'</div>'
+ +'<div class="np-counts"><span><strong>30</strong> Ekim haberi</span><span><strong>'+records.length+'</strong> kayıtlık arşiv</span><span><strong>18</strong> sinema ve sanat kategorisi</span></div>'
+ +'<section class="np-lead"><div class="np-lead-text"><div class="np-eyebrow">SİNEMA GÜNDEMİ / '+e(npDate(lead))+'</div><a href="'+href(lead)+'" class="np-textlink"><h1>'+e(lead.title)+'</h1></a><p>'+e(lead.desc||'')+'</p><div class="np-author">FRAME HABER MASASI · KAYNAKLI HABER</div></div><figure class="np-lead-visual"><a href="'+href(lead)+'"><img src="'+photourl(lead,1300)+'" alt="Konuyla ilişkili temsili sinema görseli" fetchpriority="high" loading="eager"></a><figcaption>Temsili editoryal fotoğraf · Resmî film karesi değildir</figcaption></figure><aside class="np-lead-side"><div class="np-sidecap">ÖNE ÇIKAN GELİŞMELER</div>'+sideNewsHtml+'</aside></section>'
+ +'<section class="np-section">'+section('Sinema gündemi — 30 haber','gundem',BASE+'/tr/gundem/','TÜM 30 HABER')+'<p class="np-feed-note">12–17 Ekim ve ay başından tarihli uluslararası sinema, Türkiye vizyonu, sektör ve festival haberleri. Önce kaynaklı haberler, sonra geçmiş arşiv dosyaları.</p>'+feed([sideNews[3],...first12],{images:3})+'</section>'
+ +'<section class="np-section">'+section('Gündemden diğer haberler','haber-devami',BASE+'/tr/gundem/','TÜM HABERLER')+feed(rest,{dense:true})+'</section>'
+ +'<div class="np-issue-banner"><div><strong>30 haber tek sayfada.</strong><div>Filmler, gişe, festivaller, yönetmenler ve AI gelişmeleri tarihleriyle listeleniyor.</div></div><a href="'+BASE+'/tr/gundem/">GÜNDEM SAYFASINI AÇ →</a></div>'
+ +'<section class="np-section">'+section('Özel dosyalar & kamera arkası','ozel-dosyalar',caturl('Filmcilik'))+'<div class="np-feature-grid">'+[30030,30042,30043].map(id=>{const x=pick(id);return '<a class="np-feature-card np-textlink" href="'+href(x)+'"><img src="'+photourl(x,1100)+'" loading="lazy" alt="Temsili editoryal görsel"><span class="np-meta">'+e(x.cat)+' · ARŞİV</span><h3>'+e(x.title)+'</h3><p>'+e(x.desc||'')+'</p></a>'}).join('')+'</div></section>'
+ +artRail('Dünya sineması','dunya-sinemasi','Film Dünyası',10)
+ +artRail('Festival & ödüller','festivaller','Festival',12)
+ +artRail('Yapay zekâ & sinema','ai','Yapay Zekâ',12)
+ +artRail('Sanat tarihi & sıra dışı hikâyeler','sanat','Sanat Tarihi',12)
+ +artRail('Yönetmenler & set hayatı','yonetmenlik','Yönetmenlik',12)
+ +artRail('Film atlasından seçmeler','film-atlasi','Film Atlası',12)
+ +'<section class="np-picks"><strong>18 KATEGORİ</strong>'+cats.map(c=>'<a href="'+caturl(c)+'">'+e(c)+'</a>').join('')+'</section>'
+ +'<p class="np-no-pretend">FRAME’de şu anda '+records.length+' HTML makalesi ve '+news.length+' Ekim 2026 tarihli haber bulunuyor. Tüm arşiv kayıtları kapsamlı araştırma değildir. Görseller temsili editoryal fotoğraflardır, gerçek set kareleri olarak sunulmaz. Otomatik sürekli haber yayını henüz etkin değildir.</p>';
+write('tr/index.html',page('FRAME — Sinema, Sanat ve Kültür Gazetesi',main));
 write('archive-summary.json',JSON.stringify({records:records.length,articlePages:records.length,archivePages:pages,categories:cats.length}));
 write('robots.txt','User-agent: *\nDisallow: /\n');
 console.log(JSON.stringify({records:records.length,articles:records.length,archives:pages,categories:cats.length,pages:countFiles(OUT)}));
