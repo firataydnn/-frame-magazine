@@ -14,12 +14,14 @@ for(const dir of articleDirs){
   else images++;
 }
 const home=fs.readFileSync(path.join(root,'tr','index.html'),'utf8');
-if(!home.includes('frame-front-layout'))errors.push('homepage hero layout missing');
-if(!home.includes('frame-primary'))errors.push('homepage main cover missing');
+if(!home.includes('np-lead'))errors.push('newspaper lead layout missing');
+if(!home.includes('np-lead-visual'))errors.push('newspaper main cover missing');
 if((home.match(/<img /g)||[]).length<8)errors.push('homepage visual cards missing');
 const css=fs.readFileSync(path.join(root,'assets','archive.css'),'utf8');
+const newspaperCss=fs.readFileSync(path.join(root,'assets','newspaper.css'),'utf8');
+if(!newspaperCss.includes('.np-lead')||!newspaperCss.includes('.np-newsgrid'))errors.push('newspaper responsive CSS missing');
 if(!css.includes('.frame-cover img'))errors.push('photo CSS missing');
 if(!fs.existsSync(path.join(root,'en','index.html')))errors.push('English edition missing');
 if(!fs.existsSync(path.join(root,'ar','index.html')))errors.push('Arabic edition missing');
 if(errors.length)throw new Error(errors.slice(0,20).join('\n'));
-console.log('FRAME QA passed: 556 archive article pages plus '+(articleDirs.length-556)+' existing pilot pages; '+images+' article visuals, photo-led homepage and responsive CSS.');
+console.log('FRAME QA passed: 556 archive article pages plus '+(articleDirs.length-556)+' existing pilot pages; '+images+' article visuals, newspaper homepage and responsive CSS.');
