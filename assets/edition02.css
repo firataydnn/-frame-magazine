@@ -65,3 +65,26 @@ footer{margin-top:24px;border-top:3px double #111;padding:24px 0 80px;display:fl
 @media(max-width:950px){.special-layout.is-index{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:690px){.topic-index-links a{padding:9px 10px;font-size:11px}.global-search{display:block}.global-search span{display:block;margin-bottom:10px}.global-search input{display:block;width:100%}.special-layout.is-index{grid-template-columns:repeat(2,minmax(0,1fr))}.section-foot{display:block}.section-foot a{display:inline-block;margin-top:5px}}
 @media(max-width:440px){.special-layout.is-index{grid-template-columns:1fr 1fr;gap:0 13px}.special-layout.is-index .feature-article h3{font-size:15px}.special-layout.is-index .feature-article p{display:none}.topic-index-links a{font-size:10px}.global-search span{font-size:11px}}
+
+
+/* Issue 03: all thirty headlines visible at the very start, no giant film-cover hero */
+.issue-newsboard{padding:15px 0 25px;border-bottom:3px double #191919}
+.issue-newsboard-heading{display:flex;justify-content:space-between;align-items:center;gap:25px;padding:13px 0 17px;border-bottom:2px solid #171717}
+.issue-newsboard-heading h1{font:700 clamp(31px,4.5vw,55px)/1.06 Georgia,'Times New Roman',serif;letter-spacing:-1.2px;margin:4px 0}
+.issue-newsboard-heading h1 span{color:#b7352c}
+.issue-newsboard-heading p{font:12px/1.55 Arial;color:#666;max-width:640px;margin:8px 0 0}
+.issue-kicker{font:800 10px Arial;letter-spacing:1.4px;color:#a5382e}
+.issue-total{display:flex;flex-direction:column;align-items:center;text-align:center;border-left:1px solid #d1cbc2;padding:3px 10px 3px 35px;min-width:140px}
+.issue-total strong{font:700 68px/.97 Georgia,serif;color:#b7352c}
+.issue-total span{font:800 11px Arial;letter-spacing:1.1px}
+.issue-total small{font:9px Arial;color:#8d8982;margin-top:6px}
+.issue-news-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0 23px;margin:6px 0 0}
+.issue-news-headline{display:block;padding:12px 0;border-bottom:1px solid #d9d4ca;min-width:0}
+.issue-news-headline h2{font:700 18px/1.2 Georgia,'Times New Roman',serif;letter-spacing:-.15px;margin:4px 0 0}
+.issue-news-headline:hover h2{color:#bb332b}
+.issue-news-headline.issue-first h2{font-size:22px}
+.issue-news-headline .kicker{font-size:9px}
+.issue-news-grid:before{content:none}
+.topic-index{scroll-margin-top:25px}
+@media(max-width:900px){.issue-news-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:0 17px}}
+@media(max-width:620px){.issue-newsboard{padding-top:5px}.issue-newsboard-heading{align-items:start;padding:8px 0 12px}.issue-newsboard-heading h1{font-size:32px}.issue-total{min-width:70px;padding:5px 0 3px 12px}.issue-total strong{font-size:46px}.issue-total span{font-size:8px}.issue-total small{font-size:8px}.issue-news-grid{grid-template-columns:1fr}.issue-news-headline{padding:8px 0}.issue-news-headline h2{font-size:17px;margin:3px 0 0;line-height:1.18}.issue-news-headline.issue-first h2{font-size:20px}.issue-newsboard-heading p{font-size:11px}.issue-kicker{font-size:9px}.mast{padding-top:11px;padding-bottom:12px}.wordmark{font-size:56px}.submark{font-size:8px;margin-top:5px}.nav{padding:9px 0}.issue-strip .wrap{padding:7px 0}}
