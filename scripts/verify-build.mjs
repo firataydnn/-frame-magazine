@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 const root='_site', dirs=path.join(root,'tr','articles');
-const articleDirs=fs.readdirSync(dirs,{withFileTypes:true}).filter(d=>d.isDirectory());
-if(articleDirs.length<556)throw new Error('Expected at least 556 article dirs; got '+articleDirs.length);
+const articleDirs=fs.readdirSync(dirs,{withFileTypes:true}).filter(d=>d.isDirectory() && /-\d+$/.test(d.name));
+if(articleDirs.length!==556)throw new Error('Expected 556 generated article dirs; got '+articleDirs.length);
 let images=0,errors=[];
 for(const dir of articleDirs){
   const file=path.join(dirs,dir.name,'index.html');
