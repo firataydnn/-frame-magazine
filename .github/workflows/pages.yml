@@ -12,21 +12,25 @@ concurrency:
   cancel-in-progress: true
 jobs:
   deploy:
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-      - name: Enable GitHub Pages
-        uses: actions/configure-pages@v5
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          enablement: true
-      - name: Upload site
+          node-version: '22'
+      - name: Build 556 HTML articles
+        run: node scripts/build.mjs
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload built website
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
-      - name: Publish
+          path: _site
+      - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
