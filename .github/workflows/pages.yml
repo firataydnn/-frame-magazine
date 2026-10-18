@@ -33,6 +33,26 @@ jobs:
         run: node scripts/build-issue02.mjs
       - name: Validate FRAME output
         run: node scripts/verify-build.mjs
+      - name: Replace legacy front pages with curated FRAME V4
+        run: |
+          for page in tr/index.html tr/gazete/index.html tr/mansetler/index.html tr/yeni/index.html; do
+            mkdir -p "_site/$(dirname "$page")"
+            cp tr/frontpage-v4.html "_site/$page"
+          done
+      - name: Validate published editorial page
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const homepage=fs.readFileSync('_site/tr/index.html','utf8');
+          const unique=new Set([...homepage.matchAll(/href="\/-frame-magazine\/tr\/articles\/([^"?#]+)\//g)].map(m=>m[1]));
+          const archives=new Set([...homepage.matchAll(/class="archive-entry" href="\/-frame-magazine\/tr\/articles\/([^"?#]+)\//g)].map(m=>m[1]));
+          const categories=[...homepage.matchAll(/class="issue-section"/g)].length;
+          const pictures=[...homepage.matchAll(/<img\s/g)].length;
+          if(unique.size!==572||archives.size!==542||categories!==18||pictures<9||!homepage.includes('lead-grid')||!homepage.includes('desk-grid'))
+            throw new Error('FRAME V4 validation failed: '+JSON.stringify({unique:unique.size,archives:archives.size,categories,pictures}));
+          if(!fs.statSync('_site/assets/editorial-v4.css').size)throw new Error('V4 CSS not present');
+          console.log('FRAME V4 VERIFIED:',JSON.stringify({unique:unique.size,archives:archives.size,categories,pictures}));
+          JS
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload built website
@@ -46,7 +66,7 @@ jobs:
         run: |
           set -euo pipefail
           BASE="https://firataydnn.github.io/-frame-magazine"
-          for endpoint in "/" "/tr/" "/tr/gazete/" "/tr/mansetler/" "/tr/gundem/" "/assets/edition02.css"; do
+          for endpoint in "/" "/tr/" "/tr/gazete/" "/tr/mansetler/" "/tr/gundem/" "/tr/yeni/" "/assets/editorial-v4.css"; do
             STATUS="000"
             for try in 1 2 3 4 5 6; do
               STATUS=$(curl --location --silent --show-error --output /tmp/frame-response --write-out '%{http_code}' --max-time 15 "$BASE$endpoint" || true)
@@ -58,9 +78,10 @@ jobs:
               head -c 200 /tmp/frame-response || true
               exit 1
             fi
-            if [ "$endpoint" = "/tr/mansetler/" ] || [ "$endpoint" = "/tr/gazete/" ]; then
-              grep -q 'issue-news-grid' /tmp/frame-response
-              grep -q 'Sinema dünyasından' /tmp/frame-response
-              echo "PASS: compact 30-headline first-screen newsboard appears on deployed URL"
+            if [ "$endpoint" = "/tr/mansetler/" ] || [ "$endpoint" = "/tr/gazete/" ] || [ "$endpoint" = "/tr/yeni/" ]; then
+              grep -q 'lead-grid' /tmp/frame-response
+              grep -q 'all-archive' /tmp/frame-response
+              grep -q 'Tüm hikâyeler, tek yerde' /tmp/frame-response
+              echo "PASS: photographic editorial V4 homepage and integrated archive are live"
             fi
           done
