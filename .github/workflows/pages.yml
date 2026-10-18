@@ -25,8 +25,12 @@ jobs:
           node-version: '22'
       - name: Validate publishing script
         run: node --check scripts/build.mjs
-      - name: Build 556 HTML articles
+      - name: Build all 572 HTML articles
         run: node scripts/build.mjs
+      - name: Validate issue 02 generator
+        run: node --check scripts/build-issue02.mjs
+      - name: Generate dense FRAME newspaper edition
+        run: node scripts/build-issue02.mjs
       - name: Validate FRAME output
         run: node scripts/verify-build.mjs
       - name: Configure GitHub Pages
