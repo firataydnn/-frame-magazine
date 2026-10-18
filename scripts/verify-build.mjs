@@ -14,12 +14,16 @@ for(const dir of articleDirs){
   else images++;
 }
 const home=fs.readFileSync(path.join(root,'tr','index.html'),'utf8');
-if(!home.includes('np-lead'))errors.push('newspaper lead layout missing');
-if(!home.includes('np-lead-visual'))errors.push('newspaper main cover missing');
-if((home.match(/<img /g)||[]).length<8)errors.push('homepage visual cards missing');
+if(!home.includes('top-grid'))errors.push('compact newspaper four-column front page missing');
+if(!home.includes('FRAME / SAYI 02'))errors.push('new newspaper issue marker missing');
+if(!home.includes('30</b>'))errors.push('30 news count missing from masthead');
+if((home.match(/<img /g)||[]).length<1)errors.push('newspaper lead photo missing');
 const css=fs.readFileSync(path.join(root,'assets','archive.css'),'utf8');
 const newspaperCss=fs.readFileSync(path.join(root,'assets','newspaper.css'),'utf8');
-if(!newspaperCss.includes('.np-lead')||!newspaperCss.includes('.np-newsgrid'))errors.push('newspaper responsive CSS missing');
+if(!newspaperCss.includes('.np-lead')||!newspaperCss.includes('.np-newsgrid'))errors.push('legacy newspaper responsive CSS missing');
+const issueCSS=fs.readFileSync(path.join(root,'assets','edition02.css'),'utf8');
+if(!issueCSS.includes('.top-grid')||!issueCSS.includes('@media(max-width:460px)'))errors.push('new issue responsive CSS missing');
+if(!fs.existsSync(path.join(root,'tr','gazete','index.html')))errors.push('new dedicated newspaper URL missing');
 if(!css.includes('.frame-cover img'))errors.push('photo CSS missing');
 if(!fs.existsSync(path.join(root,'en','index.html')))errors.push('English edition missing');
 if(!fs.existsSync(path.join(root,'ar','index.html')))errors.push('Arabic edition missing');
@@ -30,12 +34,12 @@ else{
  const issue=fs.readFileSync(issuePath,'utf8');
  const issueLinks=new Set([...issue.matchAll(/href="\/-frame-magazine\/tr\/articles\/([^"?#]+)\/"/g)].map(m=>m[1]));
  if(issueLinks.size!==30)errors.push('expected 30 linked October 2026 news items, got '+issueLinks.size);
- if(!issue.includes('30</strong>'))errors.push('missing news count in issue');
+ if(!issue.includes('30 haberin tamamı'))errors.push('missing all-news heading in issue');
 }
 const homepageLinks=new Set([...home.matchAll(/href="\/-frame-magazine\/tr\/articles\/([^"?#]+)\/"/g)].map(m=>m[1]));
-if(homepageLinks.size<80)errors.push('expected 80+ distinct news and feature links on homepage, got '+homepageLinks.size);
+if(homepageLinks.size<155)errors.push('expected 155+ distinct news and feature links on homepage, got '+homepageLinks.size);
 const base=JSON.parse(fs.readFileSync('data/frame_archive_556.json','utf8'));
 const added=JSON.parse(fs.readFileSync('data/frame_verified_october_2026.json','utf8'));
 if(base.length!==556||added.length!==16)errors.push('source article count drift');
 if(errors.length)throw new Error(errors.slice(0,20).join('\n'));
-console.log('FRAME QA passed: 572 article pages, 30 dated news stories, '+homepageLinks.size+' distinct homepage stories, '+images+' article visuals and responsive newspaper CSS.');
+console.log('FRAME ISSUE 02 QA passed: 572 HTML stories, 30 dated news, '+homepageLinks.size+' unique visible story links, fully responsive four-column newspaper.');
