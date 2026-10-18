@@ -23,8 +23,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Validate publishing script
+        run: node --check scripts/build.mjs
       - name: Build 556 HTML articles
         run: node scripts/build.mjs
+      - name: Validate FRAME output
+        run: node scripts/verify-build.mjs
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload built website
