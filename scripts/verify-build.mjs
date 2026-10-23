@@ -14,9 +14,9 @@ for(const dir of articleDirs){
   else images++;
 }
 const home=fs.readFileSync(path.join(root,'tr','index.html'),'utf8');
-if(!home.includes('issue-news-grid'))errors.push('30-headline newsboard at top of newspaper missing');
-if(!home.includes('Sinema dünyasından'))errors.push('all-news heading missing');
-if((home.match(/class="issue-news-headline/g)||[]).length!==30)errors.push('expected 30 visible news headlines in first section');
+if(!home.includes('issue-news-grid'))errors.push('30-headline grid missing');
+if(!home.includes('editorial-lead'))errors.push('photographic newspaper lead missing');
+if((home.match(/class="issue-news-headline/g)||[]).length!==30)errors.push('expected 30 dated news headlines below lead');
 if(!home.includes('global-search'))errors.push('full archive search missing');
 const css=fs.readFileSync(path.join(root,'assets','archive.css'),'utf8');
 const newspaperCss=fs.readFileSync(path.join(root,'assets','newspaper.css'),'utf8');
@@ -39,7 +39,7 @@ else{
  const issue=fs.readFileSync(issuePath,'utf8');
  const issueLinks=new Set([...issue.matchAll(/href="\/-frame-magazine\/tr\/articles\/([^"?#]+)\/"/g)].map(m=>m[1]));
  if(issueLinks.size!==30)errors.push('expected 30 linked October 2026 news items, got '+issueLinks.size);
- if(!issue.includes('30 haberin tamamı'))errors.push('missing all-news heading in issue');
+ if(!issue.includes('Sinema gündemi'))errors.push('missing news section heading in issue');
 }
 const homepageLinks=new Set([...home.matchAll(/href="\/-frame-magazine\/tr\/articles\/([^"?#]+)\/"/g)].map(m=>m[1]));
 if(homepageLinks.size!==572)errors.push('expected all 572 distinct article links on newspaper homepage, got '+homepageLinks.size);
@@ -47,4 +47,4 @@ const base=JSON.parse(fs.readFileSync('data/frame_archive_556.json','utf8'));
 const added=JSON.parse(fs.readFileSync('data/frame_verified_october_2026.json','utf8'));
 if(base.length!==556||added.length!==16)errors.push('source article count drift');
 if(errors.length)throw new Error(errors.slice(0,20).join('\n'));
-console.log('FRAME ISSUE 03 QA passed: 572 stories; 30 compact headlines displayed first; 572/572 links; 542 archive records; 18 categories.');
+console.log('FRAME ISSUE 04 QA passed: 572 stories; 30 compact headlines displayed first; 572/572 links; 542 archive records; 18 categories.');
