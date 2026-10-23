@@ -88,3 +88,26 @@ footer{margin-top:24px;border-top:3px double #111;padding:24px 0 80px;display:fl
 .topic-index{scroll-margin-top:25px}
 @media(max-width:900px){.issue-news-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:0 17px}}
 @media(max-width:620px){.issue-newsboard{padding-top:5px}.issue-newsboard-heading{align-items:start;padding:8px 0 12px}.issue-newsboard-heading h1{font-size:32px}.issue-total{min-width:70px;padding:5px 0 3px 12px}.issue-total strong{font-size:46px}.issue-total span{font-size:8px}.issue-total small{font-size:8px}.issue-news-grid{grid-template-columns:1fr}.issue-news-headline{padding:8px 0}.issue-news-headline h2{font-size:17px;margin:3px 0 0;line-height:1.18}.issue-news-headline.issue-first h2{font-size:20px}.issue-newsboard-heading p{font-size:11px}.issue-kicker{font-size:9px}.mast{padding-top:11px;padding-bottom:12px}.wordmark{font-size:56px}.submark{font-size:8px;margin-top:5px}.nav{padding:9px 0}.issue-strip .wrap{padding:7px 0}}
+
+
+/* ISSUE 04: designed editorial cover instead of four-column text wall */
+.editorial-lead{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(280px,.85fr);gap:26px;margin:23px 0 36px;border-bottom:3px double #1b1b1b;padding-bottom:26px}
+.editorial-cover{position:relative;isolation:isolate;min-height:500px;overflow:hidden;display:flex;flex-direction:column;justify-content:end;padding:38px;color:#fff!important;background:#292929}
+.editorial-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;filter:saturate(.8)}
+.editorial-cover:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(to top,#000e 0%,#0009 45%,transparent 95%)}
+.editorial-cover .editorial-overline{font:800 11px Arial;letter-spacing:1.8px;color:#fff;padding:9px 12px;background:#b7332c;align-self:flex-start}
+.editorial-cover h1{font:700 clamp(34px,4.1vw,62px)/1.06 Georgia,serif;letter-spacing:-1.3px;max-width:730px;margin:17px 0 10px}
+.editorial-cover p{font:15px/1.6 Arial;max-width:610px;color:#f0eeea;margin:0}
+.editorial-sidebar-head{font:900 12px Arial;letter-spacing:1.3px;padding:2px 0 15px;border-bottom:3px solid #171717}
+.editorial-sidebar-story{display:block;border-bottom:1px solid #d6d2c9;padding:15px 0}
+.editorial-sidebar-story h2{font:700 24px/1.15 Georgia,serif;letter-spacing:-.35px;margin:8px 0 0}
+.editorial-sidebar-story:hover h2{color:#b7332c}
+.editorial-section-head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;padding:14px 0;border-top:3px solid #171717;border-bottom:1px solid #d9d4ca;margin-bottom:8px}
+.editorial-section-head h2{font:700 32px/1.1 Georgia,serif;margin:0}
+.editorial-section-head p{font:12px Arial;color:#777;margin:0}
+.issue-news-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:0 28px}
+.issue-news-headline{padding:13px 0}
+.issue-news-headline h2{font-size:21px;line-height:1.17;letter-spacing:-.25px}
+.issue-news-headline:first-child h2{font-size:23px}
+@media(max-width:930px){.editorial-lead{grid-template-columns:1fr}.editorial-cover{min-height:430px}.editorial-sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 23px}.editorial-sidebar-head{grid-column:1/-1}.issue-news-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.editorial-lead{margin:16px 0 24px;gap:17px}.editorial-cover{min-height:420px;padding:23px}.editorial-cover h1{font-size:37px}.editorial-cover p{font-size:13px}.editorial-sidebar{grid-template-columns:1fr 1fr;gap:0 14px}.editorial-sidebar-story h2{font-size:18px}.editorial-section-head{display:block}.editorial-section-head h2{font-size:27px}.editorial-section-head p{margin-top:6px}.issue-news-grid{grid-template-columns:1fr}.issue-news-headline h2{font-size:19px}.issue-news-headline:first-child h2{font-size:20px}}
