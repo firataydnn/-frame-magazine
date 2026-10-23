@@ -47,4 +47,4 @@ const base=JSON.parse(fs.readFileSync('data/frame_archive_556.json','utf8'));
 const added=JSON.parse(fs.readFileSync('data/frame_verified_october_2026.json','utf8'));
 if(base.length!==556||added.length!==16)errors.push('source article count drift');
 if(errors.length)throw new Error(errors.slice(0,20).join('\n'));
-console.log('FRAME ISSUE 04 QA passed: 572 stories; 30 compact headlines displayed first; 572/572 links; 542 archive records; 18 categories.');
+console.log('FRAME ISSUE 04 QA passed: 572 stories; photo-led editorial front page plus 30 headlines; 572/572 links; 542 archive records; 18 categories.');
